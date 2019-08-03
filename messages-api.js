@@ -20,7 +20,6 @@ app.use(requestCountingMiddleware)
 
 app.post('/messages', requestCountingMiddleware, (req, res, next) => {
   reqCount.push(req.body)
-  console.log('req test:', reqCount)
   if (req.body.text === undefined || req.body.text === "") {
     res.status(400).send({ message: 'Text property is missing or empty' })
   } else {

@@ -45,7 +45,6 @@ db
       Movie
         .findOne({ where: { title: req.body.title }})
         .then((movie) => {
-          console.log('movie test', req.body.title)
           if ((movie)) {
             res.status(403).send("Title already used.")
           } else if(req.body.title === "") {
@@ -110,5 +109,6 @@ app.get('/collections', (req, res, next) => {
         .catch(next)
   })
   
+  app.get('/', (req, res) => res.send('Server is up and running'))
   app.listen(port, () => console.log("listening on port " + port))
 
