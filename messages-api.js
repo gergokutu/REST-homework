@@ -7,11 +7,11 @@ const parserMiddleware = bodyParser.json()
 app.use(parserMiddleware)
 
 const reqCount = []
+
 const requestCountingMiddleware = (req, res, next) => {
-  if (reqCount.length > 5) {
+  if (reqCount.length >= 5) {
     res.status(429).send('Too many requests')
   } else {
-      reqCount.push(req.body)
       next()
   }
 }
@@ -19,6 +19,8 @@ const requestCountingMiddleware = (req, res, next) => {
 app.use(requestCountingMiddleware)
 
 app.post('/messages', requestCountingMiddleware, (req, res, next) => {
+  reqCount.push(req.body)
+  console.log('req test:', reqCount)
   if (req.body.text === undefined || req.body.text === "") {
     res.status(400).send({ message: 'Text property is missing or empty' })
   } else {
