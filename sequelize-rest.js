@@ -40,13 +40,16 @@ db
   app.use(bodyParser.json())
   
   app.post(
-    '/',
+    '/movie',
     (req, res, next) => {
       Movie
         .findOne({ where: { title: req.body.title }})
         .then((movie) => {
+          console.log('movie test', req.body.title)
           if ((movie)) {
             res.status(403).send("Title already used.")
+          } else if(req.body.title === "") {
+            res.status(400).send("Title cannot be an empty string")
           } else {
             return Movie
               .create(req.body)
@@ -56,16 +59,24 @@ db
         .catch(next)
     }
   )
+
+app.get('/collections', (req, res, next) => {
+  const limit = req.query.limit || 2
+  const offset = req.query.offset || 0
+
+  Promise.all([
+    Movie.count(),
+    Movie.findAll({ limit, offset })
+  ])
+    .then(([total, movies]) => {
+      res.send({
+        movies, total
+      })
+    })
+    .catch(error => next(error))
+})
   
-  app.get('/collections', (req, res, next) => {
-    Movie.findAll()
-        .then(movies => {
-            res.json(movies)
-        })
-        .catch(next)
-  })
-  
-  app.get('/:id', (req, res, next) => {
+  app.get('/movie/:id', (req, res, next) => {
     Movie.findOne({where: {id: req.params.id}})
         .then(movie => {
             if (movie) {
@@ -76,7 +87,7 @@ db
         .catch(next)
   })
 
-  app.patch('/:id', (req, res, next) => {
+  app.patch('/movie/:id', (req, res, next) => {
     Movie.findOne({where: {id: req.params.id}})
         .then(movie => {
             if (movie) {
@@ -88,7 +99,7 @@ db
         .catch(next)
   })
 
-  app.delete('/:id', (req, res, next) => {
+  app.delete('/movie/:id', (req, res, next) => {
     Movie.destroy({where: {id: req.params.id}})
         .then(movie => {
             if (movie) {
